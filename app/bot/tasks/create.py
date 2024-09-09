@@ -11,7 +11,8 @@ create_router = Router(name='__create_task__')
 async def _create_task(message: types.Message, text: str):
     """Создает задачу"""
     await message.delete()
-    task_message = await message.answer(text, reply_markup=kb.TASK_KEYBOARD)
+    keyboard = await kb.get_formated_task_keyboard(text)
+    task_message = await message.answer(text, reply_markup=keyboard)
     task = await service.create_task(task_message.chat.id, task_message.message_id, task_message.text)
     # В случае, если вернется ошибка.
     if isinstance(task, str):

@@ -56,7 +56,8 @@ async def _back_to_main_entity(callback_query: types.CallbackQuery, state: FSMCo
         await service.update_task(msg.chat.id, msg.message_id, msg.text)
     else:
         await callback_query.message.edit_text(text=data['origin_text'])
-    await callback_query.message.edit_reply_markup(reply_markup=kb.TASK_KEYBOARD)
+    keyboard = await kb.get_formated_task_keyboard(callback_query.message.text)
+    await callback_query.message.edit_reply_markup(reply_markup=keyboard)
 
 
 @update_router.callback_query(TaskState.edit, F.data == 'content')
