@@ -18,6 +18,7 @@ class Task(Base):
     message_id: Mapped[int] = mapped_column(BigInteger(), index=True)
     
     # Временная метка сообщения
+    notification: Mapped[bool] = mapped_column(server_default=text("TRUE"))
     creation_time: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
 
     # Контент

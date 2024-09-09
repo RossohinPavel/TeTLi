@@ -14,13 +14,14 @@ def _session_decorator(func):
                 return await func(*args, session=session, **kwargs)
             except Exception as e:
                 await session.rollback()
+                print(e)
                 return str(e)
     return inner
 
 
 @_session_decorator
 async def create_task(telegram_id: int, message_id: int, content: str, session: AsyncSession = None) -> Task:
-    """Создание задачи. Возвращает ее id"""
+    """Создание задачи. Возвращает объект задачи"""
     task = Task(telegram_id=telegram_id, message_id=message_id, content=content)
     session.add(task)
     await session.commit()
@@ -29,7 +30,7 @@ async def create_task(telegram_id: int, message_id: int, content: str, session: 
 
 @_session_decorator
 async def update_task(telegram_id: int, message_id: int, content: str, session: AsyncSession = None):
-    """Выдает список задач пользователя в виде генератора"""
+    """Обновляет задачу."""
     stmt = (
         update(Task).
         where(Task.telegram_id == telegram_id, Task.message_id == message_id).
@@ -60,7 +61,7 @@ async def get_old_tasks(session: AsyncSession = None) -> tuple[Task]:
         .where(Task.creation_time < text("TIMEZONE('utc', now() - make_interval(days => 2) + make_interval(mins => 10))"))
     )
     res = await session.execute(query)
-    return tuple(res.scalars())
+    return res.scalars().all()
 
 
 @_session_decorator
@@ -70,3 +71,22 @@ async def update_old_tasks(tasks: list[Task], session: AsyncSession = None):
         task.creation_time = text("TIMEZONE('utc', now())")
         session.add(task)
     await session.commit()
+
+
+@_session_decorator
+async def update_notification_mode(telegram_id: int, message_id: int, session: AsyncSession = None) -> bool:
+    """Меняет статус оповещений и возвращает новое значение"""
+    stmt = text("""
+        UPDATE public.app_tasks 
+        SET notification = NOT notification 
+        WHERE telegram_id=:telegram_id AND message_id=:message_id
+    """)
+    stmt = stmt.bindparams(telegram_id=telegram_id, message_id=message_id)
+    await session.execute(stmt)
+    await session.commit()
+    query = (
+        select(Task.notification).
+        where(Task.telegram_id == telegram_id, Task.message_id == message_id)
+    )
+    res = await session.execute(query)
+    return res.scalars().first()

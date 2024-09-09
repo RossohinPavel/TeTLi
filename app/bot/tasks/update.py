@@ -10,12 +10,14 @@ from . import keyboards as kb
 from . import utils
 
 
+update_router = Router(name='__update__')
+
+
 class TaskState(StatesGroup):
     edit = State()
 
 
-update_router = Router(name='__update__')
-
+# ----- Выполнение задачи -----
 
 @update_router.callback_query(lambda c: c.data and c.data.startswith('exec'))
 async def execute_task(callback_query: types.CallbackQuery):
@@ -25,6 +27,20 @@ async def execute_task(callback_query: types.CallbackQuery):
     task = await utils.reduce_task_content(callback_query.message.text)
     await callback_query.answer(text=f'Задача <{task}> выполнена.')
 
+
+# ----- Смена режима оповещений -----
+
+@update_router.callback_query(lambda c: c.data and c.data.startswith('notice'))
+async def change_notification_mode(callback_query: types.CallbackQuery):
+    """Ловит калбэк с клавиатуры и выполняет задачу"""
+    res = await service.update_notification_mode(callback_query.message.chat.id, callback_query.message.message_id)
+    keyboard = callback_query.message.reply_markup
+    button = keyboard.inline_keyboard[1][0]
+    button.text = kb.NOTIFICATION_BUTTON_PRE + (kb.NOTIFICATION_BUTTON_ON if res else kb.NOTIFICATION_BUTTON_OFF)
+    await callback_query.message.edit_reply_markup(reply_markup=keyboard)
+
+
+# ----- Редактирование задачи -----
 
 @update_router.callback_query(lambda c: c.data and c.data.startswith('edit'))
 async def init_edit(callback_query: types.CallbackQuery, state: FSMContext):

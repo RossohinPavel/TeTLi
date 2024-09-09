@@ -27,5 +27,6 @@ async def _resend_message(bot: Bot, task: service.Task):
         await bot.delete_message(task.telegram_id, message_id=task.message_id)
     except:
         pass
-    msg = await bot.send_message(task.telegram_id, text=task.content, reply_markup=kb.TASK_KEYBOARD)
+    keyboard = await kb.get_formated_task_keyboard(task.content)
+    msg = await bot.send_message(task.telegram_id, text=task.content, reply_markup=keyboard)
     task.message_id = msg.message_id

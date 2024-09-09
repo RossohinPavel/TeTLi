@@ -2,6 +2,11 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup, InlineKeyboardButton
 
 
+NOTIFICATION_BUTTON_PRE = 'Напоминание: '
+NOTIFICATION_BUTTON_ON = 'Вкл'
+NOTIFICATION_BUTTON_OFF = 'Выкл'
+
+
 def create_task_keyboard(column=False) -> InlineKeyboardMarkup:
     """Формирует клавиатуру для задачи"""
     keyboard = InlineKeyboardBuilder()
@@ -14,8 +19,8 @@ def create_task_keyboard(column=False) -> InlineKeyboardMarkup:
 def create_task_edit_keyboard() -> InlineKeyboardMarkup:
     """Генерация клавиатуры для редактирования задачи"""
     keyboard = InlineKeyboardBuilder()
-    # keyboard.button(text='Подзадача', callback_data=f'sub')
     keyboard.button(text='Содержание', callback_data=f'content')
+    # keyboard.button(text=NOTIFICATION_BUTTON_PRE + NOTIFICATION_BUTTON_ON, callback_data=f'notice')
     keyboard.adjust(1)
     keyboard.row(
         InlineKeyboardButton(text='Отмена', callback_data='back'),
