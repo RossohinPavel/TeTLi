@@ -2,7 +2,6 @@
 from aiogram import Router, types, F
 from orm import service
 from . import keyboards as kb
-from audio.stt import STT
 from . import utils
 
 
@@ -27,9 +26,7 @@ async def create_task_from_text(message: types.Message):
 
 
 @create_router.message(F.voice)
-async def create_task_from_audio(message: types.Message):
+async def create_task_from_voice(message: types.Message):
     """Создание задачи из аудио сообщения"""
-    audio_stream = await utils.get_file_binary(message.bot, message.voice.file_id)
-    stt_obj = await STT.from_ogg_binary(audio_stream)
-    text = await stt_obj.recognition()
+    text = await utils.get_text_from_voice_message(message)
     await _create_task(message, text)

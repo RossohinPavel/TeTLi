@@ -1,7 +1,10 @@
 """Набор скриптов для редактирования задачи"""
+import asyncio
+
 from aiogram import Router, types, F
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+
 from orm import service
 from . import keyboards as kb
 from . import utils
@@ -57,21 +60,37 @@ async def _back_to_main_entity(callback_query: types.CallbackQuery, state: FSMCo
 
 
 @update_router.callback_query(TaskState.edit, F.data == 'content')
-async def init_task_title_edit(callback_query: types.CallbackQuery, state: FSMContext):
+async def init_task_edit(callback_query: types.CallbackQuery, state: FSMContext):
     """Инициализация редактирования задачи"""
     text = 'Введите новый текст задачи.\nЕсли нужно поменять текст в сторой задаче - скопируйте текст сообщения бота.'
     msg = await callback_query.message.answer(text=text)
     await state.update_data({'query_msg': msg})
 
 
-@update_router.message(TaskState.edit, F.content_type.in_({'text'}))
-async def update_task_msg_content(message: types.Message, state: FSMContext):
-    """Обновляет Информацию задачи"""
-    # Очистка чата от сообщений
-    await message.delete()
+@update_router.message(TaskState.edit, F.text)
+async def update_task_content_from_text(message: types.Message, state: FSMContext):
+    """Инициирует обновление задачи по отправленному текстовому сообщению"""
+    await _update_task_content(message.text, message, state)
+
+
+@update_router.message(TaskState.edit, F.voice)
+async def update_task_content_from_voice(message: types.Message, state: FSMContext):
+    """Инициирует обновление задачи по отправленному аудио сообщению."""
+    new_text = await utils.get_text_from_voice_message(message)
+    await _update_task_content(new_text, message, state)
+
+
+async def _update_task_content(new_text: str, message: types.Message, state: FSMContext):
+    """Непосредственно обновляет задачу"""
     data = await state.get_data()
-    await data['query_msg'].delete()
-    if message.text != data['task_msg'].text:
+    # Очистка чата от сообщений
+    asyncio.create_task(
+        message.bot.delete_messages(
+            message.chat.id,
+            (message.message_id, data['query_msg'].message_id)
+        )
+    )
+    if new_text != data['task_msg'].text:
         kb = data['task_msg'].reply_markup
-        new_msg = await data['task_msg'].edit_text(text=message.text, reply_markup=kb)
+        new_msg = await data['task_msg'].edit_text(text=new_text, reply_markup=kb)
         await state.update_data({'task_msg': new_msg})
