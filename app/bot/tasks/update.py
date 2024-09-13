@@ -79,7 +79,7 @@ async def _back_to_main_entity(callback_query: types.CallbackQuery, state: FSMCo
 @update_router.callback_query(TaskState.edit, F.data == 'content')
 async def init_task_edit(callback_query: types.CallbackQuery, state: FSMContext):
     """Инициализация редактирования задачи"""
-    text = 'Введите новый текст задачи.\nЕсли нужно поменять текст в сторой задаче - скопируйте текст сообщения бота.'
+    text = 'Введите новый текст задачи.'
     msg = await callback_query.message.answer(text=text)
     await state.update_data({'query_msg': msg})
 
