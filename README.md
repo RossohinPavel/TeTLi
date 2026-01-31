@@ -1,4 +1,4 @@
-# TelegramTODOList
+# TeTLi - Telegram Todo List
 
 Телеграм бот реализующий функционал всем известного листа заметок.
 
