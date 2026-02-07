@@ -1,10 +1,11 @@
+import { ApiModule } from "./api/api.module";
 import { AppController } from "./app.controller";
+import { BotModule } from "./bot/bot.module";
 import { Module } from "@nestjs/common";
-import { BotModule } from './bot/bot.module';
-import { AppsModule } from './apps/apps.module';
+
 
 @Module({
-  imports: [BotModule, AppsModule],
+  imports: [BotModule, ApiModule],
   controllers: [AppController],
   providers: [],
 })

@@ -1,11 +1,11 @@
-import { Action, Ctx, Help, On, Start, Update } from "nestjs-telegraf";
-import { Context } from 'telegraf';
 import { BotService } from "./bot.service";
+import { Action, Ctx, Help, On, Start, Update } from "nestjs-telegraf";
+import { Context } from "telegraf";
 import { Message } from "telegraf/types";
+
 
 @Update()
 export class BotUpdate {
-
   constructor(private readonly botService: BotService) {}
 
   @Start()
@@ -18,28 +18,28 @@ export class BotUpdate {
     await ctx.reply(this.botService.getHelpMessage());
   }
 
-  @On('text')
+  @On("text")
   async onText(@Ctx() ctx: Context) {
     const message = `Task created: ${ctx.text}`;
     const kb = this.botService.getKeyboard();
     await ctx.reply(message, kb);
   }
 
-  @On('voice')
+  @On("voice")
   async onVoice(@Ctx() ctx: Context) {
     const message = ctx.message as Message.VoiceMessage;
-    await ctx.reply(`Voice message id ${message.voice.file_id}`)
+    await ctx.reply(`Voice message id ${message.voice.file_id}`);
   }
 
-  @Action('edit')
+  @Action("edit")
   async onEdit(@Ctx() ctx: Context) {
     await ctx.answerCbQuery();
-    await ctx.editMessageText('Вы выбрали: Изменить');
+    await ctx.editMessageText("Вы выбрали: Изменить");
   }
 
-  @Action('done')
+  @Action("done")
   async onDone(@Ctx() ctx: Context) {
     await ctx.answerCbQuery();
-    await ctx.reply('Выполнено!');
+    await ctx.reply("Выполнено!");
   }
 }
