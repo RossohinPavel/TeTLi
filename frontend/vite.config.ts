@@ -1,6 +1,6 @@
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
-import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -8,9 +8,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "apps"),
-        edit: resolve(__dirname, "apps/edit"),
+        main: resolve(__dirname, "apps/index.html"),
+        edit: resolve(__dirname, "apps/edit/index.html"),
       },
     },
+  },
+  server: {
+    allowedHosts: ['.loca.lt'],
   },
 });

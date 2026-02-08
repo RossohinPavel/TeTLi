@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "lt": "lt --port 5173 --subdomain heart-coding",
     "format": "prettier --log-level warn --cache --write {src/**/*,*}.{ts,tsx,js,json,yaml,scss,css} !**/{node_modules,dist}/**/*",
     "types": "tsc --noEmit --project ./tsconfig.node.json && tsc --noEmit --project ./tsconfig.json",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/.eslintcache --ext .ts,.tsx ./src --fix",
@@ -27,6 +28,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "eslint-plugin-unused-imports": "^4.3.0",
     "globals": "^16.5.0",
+    "localtunnel": "^2.0.2",
     "prettier": "^3.8.1",
     "react-hooks": "^1.0.1",
     "typescript": "~5.9.3",

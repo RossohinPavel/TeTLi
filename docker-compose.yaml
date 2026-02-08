@@ -1,37 +1,48 @@
 x-app_environment: &app_environment
   environment:
-    # Postgres
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
+    # Postgress
     - POSTGRES_HOST
     - POSTGRES_PORT
-    - POSTGRES_NAME
-    # Telebot
-    - BOT_TOKEN
-    # SQLAlchemy
-    - SQLA_ECHO
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    - POSTGRES_DB
+
+# x-app_environment: &app_environment
+#   environment:
+#     # Postgres
+#     - POSTGRES_USER
+#     - POSTGRES_PASSWORD
+#     - POSTGRES_HOST
+#     - POSTGRES_PORT
+#     - POSTGRES_NAME
+#     # Telebot
+#     - BOT_TOKEN
+#     # SQLAlchemy
+#     - SQLA_ECHO
 
 services:
   db:
-    restart: always
-    image: postgres:16.3-alpine
+    restart: unless-stopped
+    image: postgres:18.1-alpine3.23
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POSTGRES_PORT}:5432
     volumes:
-      - ./postgresdata:/var/lib/postgresql/data
+      - postgresdata:/var/lib/postgresql/
     environment:
-      - POSTGRES_PASSWORD
-      - POSTGRES_PORT
-      - POSTGRES_NAME
+      - POSTGRES_DB
       - POSTGRES_USER
-  
-  app:
-    restart: always
-    build:
-      context: ./app
-    command: sh -c "python wait-for &&
-                    alembic upgrade head &&
-                    python main.py"
-    volumes:
-      - ./app:/app
-    <<: *app_environment
+      - POSTGRES_PASSWORD
+
+volumes:
+  postgresdata:
+
+  # app:
+  #   restart: always
+  #   build:
+  #     context: ./app
+  #   command: sh -c "python wait-for &&
+  #                   alembic upgrade head &&
+  #                   python main.py"
+  #   volumes:
+  #     - ./app:/app
+  #   <<: *app_environment

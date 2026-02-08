@@ -1,28 +1,32 @@
 import { BotService } from "./bot.service";
 import { Action, Ctx, Help, On, Start, Update } from "nestjs-telegraf";
-import { Context } from "telegraf";
+import { Context, Types } from "telegraf";
 import { Message } from "telegraf/types";
 
 
 @Update()
 export class BotUpdate {
-  constructor(private readonly botService: BotService) {}
+  constructor(
+    private readonly service: BotService
+  ) {}
 
   @Start()
   async start(@Ctx() ctx: Context) {
-    await ctx.reply(this.botService.getHelloMessage());
+    await ctx.reply(this.service.getHelloMessage());
   }
 
   @Help()
   async help(@Ctx() ctx: Context) {
-    await ctx.reply(this.botService.getHelpMessage());
+    await ctx.reply(this.service.getHelpMessage());
   }
 
   @On("text")
   async onText(@Ctx() ctx: Context) {
-    const message = `Task created: ${ctx.text}`;
-    const kb = this.botService.getKeyboard();
-    await ctx.reply(message, kb);
+    const deleteTask = ctx.deleteMessage();
+    const kb = this.service.getKeyboard();
+    await ctx.reply(ctx.text || "Default message", kb);
+    await deleteTask;
+    await this.service.createNewTask();
   }
 
   @On("voice")
@@ -39,7 +43,7 @@ export class BotUpdate {
 
   @Action("done")
   async onDone(@Ctx() ctx: Context) {
-    await ctx.answerCbQuery();
-    await ctx.reply("Выполнено!");
+    await ctx.answerCbQuery("Выполнено!");
+    await ctx.deleteMessage();
   }
 }

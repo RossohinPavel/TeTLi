@@ -24,7 +24,9 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-fastify": "^11.1.12",
+    "drizzle-orm": "^0.45.1",
     "nestjs-telegraf": "^2.9.1",
+    "postgres": "^3.4.8",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "telegraf": "^4.16.3"
@@ -38,6 +40,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.32.0",
